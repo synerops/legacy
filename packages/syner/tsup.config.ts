@@ -16,4 +16,8 @@ export default defineConfig({
 
   splitting: false,
   treeshake: true,
+
+  loader: {
+    ".md": "text",
+  },
 })
