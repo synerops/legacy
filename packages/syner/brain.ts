@@ -6,10 +6,9 @@
  */
 
 import { generateText, gateway } from 'ai'
-import { card } from './card'
 
 export interface ThinkOptions {
-  systemPrompt?: string
+  systemPrompt: string
   model?: string
 }
 
@@ -17,16 +16,14 @@ export interface ThinkResponse {
   text: string
 }
 
-export async function think(prompt: string, options?: ThinkOptions): Promise<ThinkResponse> {
-  const modelId = options?.model
+export async function think(prompt: string, options: ThinkOptions): Promise<ThinkResponse> {
+  const modelId = options.model
     ?? process.env.SYNER_ASSISTANT_MODEL
     ?? 'anthropic/claude-sonnet-4'
 
-  const systemPrompt = options?.systemPrompt ?? card().content
-
   const result = await generateText({
     model: gateway(modelId),
-    system: systemPrompt,
+    system: options.systemPrompt,
     prompt,
   })
 
