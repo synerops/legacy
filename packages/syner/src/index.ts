@@ -1,8 +1,14 @@
 /**
  * Syner - Brain of Syner OS
  *
- * Intent classification and orchestration primitives.
+ * Agent card, brain, and intent classification.
  */
+
+// Agent card
+export { card, type AgentCard } from '../card'
+
+// Brain
+export { think, type ThinkOptions, type ThinkResponse } from '../brain'
 
 // Intent classification
 export {
