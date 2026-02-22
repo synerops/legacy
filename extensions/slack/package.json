@@ -29,6 +29,7 @@
   "files": [
     "dist",
     "src/index.d.ts",
+    "src/types.ts",
     "README.md"
   ],
   "scripts": {
