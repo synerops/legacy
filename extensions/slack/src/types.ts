@@ -90,6 +90,17 @@ export interface SlackHandlerOptions {
   /** Slack app signing secret for request verification */
   signingSecret: string
 
+  /** Called when an event dispatch throws. Defaults to silent. */
+  onError?: (error: unknown) => void
+
+  /**
+   * Schedules work after the response is sent.
+   * Next.js: pass `after` from 'next/server'.
+   * Cloudflare: wrap `ctx.waitUntil()`.
+   * If omitted, dispatch runs as fire-and-forget.
+   */
+  afterFn?: (callback: () => Promise<void>) => void
+
   /** Called when the bot is @mentioned in a channel */
   onAppMention?: (event: AppMentionEvent, envelope: SlackEventCallback<AppMentionEvent>) => Promise<void>
 

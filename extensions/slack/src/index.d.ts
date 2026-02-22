@@ -1,99 +1,37 @@
 /**
  * @syner/slack type declarations
+ *
+ * Event types re-exported from ./types (single source of truth).
+ * Function signatures and client-only types declared inline
+ * since tsup dts is disabled.
  */
 
 import type { WebClient } from '@slack/web-api'
 
 // ============================================================================
-// Event Types
+// Event Types (from ./types — do NOT redeclare here)
 // ============================================================================
 
-export interface SlackUrlVerification {
-  type: 'url_verification'
-  token: string
-  challenge: string
-}
-
-export interface SlackEventCallback<E = SlackEvent> {
-  type: 'event_callback'
-  token: string
-  team_id: string
-  api_app_id: string
-  event: E
-  event_id: string
-  event_time: number
-}
-
-export type SlackPayload = SlackUrlVerification | SlackEventCallback
-
-export interface AppMentionEvent {
-  type: 'app_mention'
-  user: string
-  text: string
-  ts: string
-  channel: string
-  event_ts: string
-  thread_ts?: string
-}
-
-export interface AssistantThreadContext {
-  channel_id: string
-  team_id: string
-  enterprise_id?: string
-}
-
-export interface AssistantThread {
-  user_id: string
-  context: AssistantThreadContext
-  channel_id: string
-  thread_ts: string
-}
-
-export interface AssistantThreadStartedEvent {
-  type: 'assistant_thread_started'
-  assistant_thread: AssistantThread
-}
-
-export interface AssistantThreadContextChangedEvent {
-  type: 'assistant_thread_context_changed'
-  assistant_thread: AssistantThread
-}
-
-export interface MessageEvent {
-  type: 'message'
-  channel: string
-  user: string
-  text: string
-  ts: string
-  thread_ts?: string
-  channel_type: 'im' | 'channel' | 'group' | 'mpim'
-  subtype?: string
-  bot_id?: string
-}
-
-export type SlackEvent =
-  | AppMentionEvent
-  | AssistantThreadStartedEvent
-  | AssistantThreadContextChangedEvent
-  | MessageEvent
+export type {
+  SlackUrlVerification,
+  SlackEventCallback,
+  SlackPayload,
+  SlackEvent,
+  AppMentionEvent,
+  AssistantThreadStartedEvent,
+  AssistantThreadContextChangedEvent,
+  AssistantThread,
+  AssistantThreadContext,
+  MessageEvent,
+  SlackHandlerOptions,
+  SlackClientOptions,
+} from './types'
 
 // ============================================================================
 // Handler
 // ============================================================================
 
-export interface SlackHandlerOptions {
-  signingSecret: string
-  onAppMention?: (event: AppMentionEvent, envelope: SlackEventCallback<AppMentionEvent>) => Promise<void>
-  onAssistantThreadStarted?: (
-    event: AssistantThreadStartedEvent,
-    envelope: SlackEventCallback<AssistantThreadStartedEvent>
-  ) => Promise<void>
-  onAssistantThreadContextChanged?: (
-    event: AssistantThreadContextChangedEvent,
-    envelope: SlackEventCallback<AssistantThreadContextChangedEvent>
-  ) => Promise<void>
-  onMessage?: (event: MessageEvent, envelope: SlackEventCallback<MessageEvent>) => Promise<void>
-}
+import type { SlackHandlerOptions } from './types'
 
 export declare function createHandler(
   options: SlackHandlerOptions
@@ -105,11 +43,9 @@ export declare function createHandler(
 
 export type SlackClient = WebClient
 
-export interface SlackClientOptions {
-  botToken: string
-}
-
-export declare function createSlackClient(options: SlackClientOptions): SlackClient
+export declare function createSlackClient(
+  options: import('./types').SlackClientOptions
+): SlackClient
 
 export interface SendMessageOptions {
   channel: string

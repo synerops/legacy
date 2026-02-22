@@ -21,10 +21,10 @@
  * const response = await handler(request)
  * ```
  *
- * Note: Callbacks are fire-and-forget — the handler returns 200
- * immediately to meet Slack's 3-second deadline. On serverless
- * platforms, use `after()` or `waitUntil()` inside callbacks
- * to keep the function alive until async work completes.
+ * Note: The handler returns 200 immediately to meet Slack's
+ * 3-second deadline. Pass `afterFn` (e.g. Next.js `after`) to
+ * keep the serverless function alive for async work. Without
+ * `afterFn`, dispatch runs as fire-and-forget.
  */
 
 import { createHmac, timingSafeEqual } from 'node:crypto'
@@ -58,7 +58,8 @@ function verifySignature(
 
   // Reject requests older than 5 minutes (replay protection)
   const now = Math.floor(Date.now() / 1000)
-  if (Math.abs(now - Number(timestamp)) > MAX_TIMESTAMP_AGE_S) return false
+  const ts = Number(timestamp)
+  if (Number.isNaN(ts) || Math.abs(now - ts) > MAX_TIMESTAMP_AGE_S) return false
 
   // Compute expected signature: v0=sha256(v0:timestamp:body)
   const baseString = `v0:${timestamp}:${body}`
@@ -110,10 +111,18 @@ export function createHandler(options: SlackHandlerOptions) {
       })
     }
 
-    // Event callback — fire and forget, respond 200 immediately.
-    // Slack enforces a 3-second timeout on event acknowledgment.
+    // Event callback — respond 200 immediately to meet Slack's 3-second deadline.
+    // If afterFn is provided, use it to keep serverless function alive.
+    // Otherwise, fire-and-forget.
     if (payload.type === 'event_callback') {
-      Promise.resolve(dispatch(options, payload)).catch(console.error)
+      const handle = () =>
+        dispatch(options, payload).catch((error) => { options.onError?.(error) })
+
+      if (options.afterFn) {
+        options.afterFn(handle)
+      } else {
+        handle()
+      }
     }
 
     return new Response('ok', { status: 200 })
@@ -150,8 +159,8 @@ async function dispatch(
 
     case 'message': {
       const msg = event as MessageEvent
-      // Skip bot messages to prevent loops
-      if (msg.bot_id || msg.subtype) break
+      // Skip bot-originated messages to prevent echo loops
+      if (msg.bot_id || msg.subtype === 'bot_message') break
       await options.onMessage?.(msg, envelope as SlackEventCallback<MessageEvent>)
       break
     }
