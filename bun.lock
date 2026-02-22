@@ -60,6 +60,7 @@
         "react": "catalog:next16",
         "react-dom": "catalog:next16",
         "sonner": "catalog:ui",
+        "syner": "workspace:*",
         "tailwind-merge": "^2.5.4",
       },
       "devDependencies": {
@@ -188,6 +189,9 @@
     "packages/syner": {
       "name": "syner",
       "version": "0.0.0-dev.1",
+      "dependencies": {
+        "ai": "catalog:aisdk",
+      },
       "devDependencies": {
         "@syner/eslint": "workspace:*",
         "@syner/prettier": "workspace:*",

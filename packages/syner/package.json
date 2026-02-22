@@ -36,6 +36,9 @@
     "detect": "bun run tools/detect.ts",
     "dispatch": "bun run tools/dispatch.ts"
   },
+  "dependencies": {
+    "ai": "catalog:aisdk"
+  },
   "peerDependencies": {
     "zod": "catalog:aisdk"
   },

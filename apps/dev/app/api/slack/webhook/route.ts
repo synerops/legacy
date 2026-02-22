@@ -13,6 +13,7 @@
 
 import { after } from 'next/server'
 import { createHandler, createSlackClient, replyInThread, setAssistantStatus } from '@syner/slack'
+import { think } from 'syner'
 
 function getSlackClient() {
   const botToken = process.env.SLACK_BOT_TOKEN
@@ -27,26 +28,27 @@ export const POST = createHandler({
 
   onAppMention: async (event) => {
     const client = getSlackClient()
-    await replyInThread(client, {
-      channel: event.channel,
-      threadTs: event.thread_ts ?? event.ts,
-      text: `👋 Got your mention! (syner v0)`,
-    })
+    const channel = event.channel
+    const threadTs = event.thread_ts ?? event.ts
+
+    await setAssistantStatus(client, { channelId: channel, threadTs, status: 'Thinking...' })
+
+    const { text } = await think(event.text)
+    await replyInThread(client, { channel, threadTs, text })
   },
 
   onAssistantThreadStarted: async (event) => {
     const client = getSlackClient()
     const { channel_id, thread_ts } = event.assistant_thread
+
     await setAssistantStatus(client, {
       channelId: channel_id,
       threadTs: thread_ts,
       status: 'Thinking...',
     })
-    await replyInThread(client, {
-      channel: channel_id,
-      threadTs: thread_ts,
-      text: "Hello! I'm Syner. How can I help?",
-    })
+
+    const { text } = await think('A new conversation has started. Introduce yourself briefly.')
+    await replyInThread(client, { channel: channel_id, threadTs: thread_ts, text })
   },
 
   onAssistantThreadContextChanged: async (event) => {
@@ -61,10 +63,12 @@ export const POST = createHandler({
 
   onMessage: async (event) => {
     const client = getSlackClient()
-    await replyInThread(client, {
-      channel: event.channel,
-      threadTs: event.thread_ts ?? event.ts,
-      text: `Echo: ${event.text}`,
-    })
+    const channel = event.channel
+    const threadTs = event.thread_ts ?? event.ts
+
+    await setAssistantStatus(client, { channelId: channel, threadTs, status: 'Thinking...' })
+
+    const { text } = await think(event.text)
+    await replyInThread(client, { channel, threadTs, text })
   },
 })

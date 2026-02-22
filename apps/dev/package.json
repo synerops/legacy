@@ -14,6 +14,7 @@
     "@syner/sdk": "workspace:*",
     "@syner/slack": "workspace:*",
     "@syner/ui": "workspace:*",
+    "syner": "workspace:*",
     "@vercel/analytics": "catalog:vercel",
     "clsx": "^2.1.1",
     "fumadocs-core": "catalog:docs",
