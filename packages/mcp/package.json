@@ -1,0 +1,60 @@
+{
+  "name": "@syner/mcp",
+  "version": "0.0.0-dev.1",
+  "description": "MCP server exposing Syner tools for Claude Code integration",
+  "type": "module",
+  "private": false,
+  "sideEffects": false,
+  "license": "MIT",
+  "prettier": "@syner/prettier",
+  "author": {
+    "name": "SynerOps, Inc",
+    "email": "info@synerops.com",
+    "url": "https://synerops.com"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "bin": {
+    "syner-mcp": "./dist/server.js"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "start": "bun run src/server.ts",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint . --max-warnings 0",
+    "format": "prettier --check . --ignore-path ../../.gitignore",
+    "format:fix": "prettier --write . --ignore-path ../../.gitignore",
+    "clean": "rm -rf dist .turbo"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "@syner/github": "workspace:*",
+    "@syner/sdk": "workspace:*"
+  },
+  "peerDependencies": {
+    "ai": "catalog:aisdk",
+    "zod": "catalog:aisdk"
+  },
+  "devDependencies": {
+    "@syner/eslint": "workspace:*",
+    "@syner/prettier": "workspace:*",
+    "@syner/typescript": "workspace:*",
+    "@types/bun": "*",
+    "eslint": "catalog:",
+    "prettier": "catalog:",
+    "tsup": "^8.5.0",
+    "typescript": "catalog:"
+  }
+}
