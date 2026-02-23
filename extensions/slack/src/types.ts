@@ -128,3 +128,20 @@ export interface SlackClientOptions {
   /** Bot User OAuth Token (xoxb-...) */
   botToken: string
 }
+
+// ============================================================================
+// Streaming
+// ============================================================================
+
+export interface StreamReplyOptions {
+  /** Channel ID */
+  channel: string
+  /** Parent thread timestamp (streaming only works in threads) */
+  threadTs: string
+  /** Team ID of the recipient (required in channels, optional in DMs) */
+  teamId?: string
+  /** User ID of the recipient (required in channels, optional in DMs) */
+  userId?: string
+  /** Async iterable of text deltas (e.g. from AI SDK streamText().textStream) */
+  textStream: AsyncIterable<string>
+}

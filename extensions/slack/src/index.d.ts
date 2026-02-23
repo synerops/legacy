@@ -25,6 +25,7 @@ export type {
   MessageEvent,
   SlackHandlerOptions,
   SlackClientOptions,
+  StreamReplyOptions,
 } from './types'
 
 // ============================================================================
@@ -101,3 +102,8 @@ export declare function setAssistantSuggestedPrompts(
   client: SlackClient,
   options: SetAssistantSuggestedPromptsOptions
 ): Promise<unknown>
+
+export declare function streamReply(
+  client: SlackClient,
+  options: import('./types').StreamReplyOptions
+): Promise<{ text: string }>
