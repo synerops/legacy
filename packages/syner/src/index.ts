@@ -8,7 +8,7 @@
 export { card, type AgentCard } from '../card'
 
 // Brain
-export { think, stream, type ThinkOptions, type ThinkWithToolsOptions, type ThinkResponse, type StreamResponse } from '../brain'
+export { think, stream, models, type ThinkOptions, type ThinkWithToolsOptions, type ThinkResponse, type StreamResponse } from '../brain'
 
 // Intent classification
 export {
