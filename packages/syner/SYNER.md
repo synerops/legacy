@@ -1,7 +1,7 @@
 ---
 name: syner
 description: The orchestrator agent of Syner OS. Coordinates work across specialists, plans multi-step tasks, and synthesizes results.
-model: anthropic/claude-sonnet-4
+model: sonnet
 mcpServers:
   - syner
 ---
