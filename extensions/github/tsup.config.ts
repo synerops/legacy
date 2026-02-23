@@ -8,14 +8,12 @@ export default defineConfig({
     oauth: 'src/oauth/index.ts',
   },
   format: ['cjs', 'esm'],
-  // DTS disabled due to AI SDK v6 + tsup type inference issues
-  // Manual type declarations are provided in src/index.d.ts
-  dts: false,
+  dts: true,
   clean: true,
   sourcemap: true,
   target: 'es2020',
 
-  external: ['@syner/sdk', 'octokit', 'zod', /^node:/],
+  external: ['@syner/sdk', 'octokit', 'zod', 'ai', /^node:/],
 
   splitting: false,
   treeshake: true,

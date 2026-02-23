@@ -26,22 +26,20 @@
   },
   "exports": {
     ".": {
-      "types": "./src/index.d.ts",
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
     },
     "./oauth": {
-      "types": "./src/oauth/index.d.ts",
+      "types": "./dist/oauth.d.ts",
       "import": "./dist/oauth.js",
       "require": "./dist/oauth.cjs"
     }
   },
   "main": "./dist/index.js",
-  "types": "./src/index.d.ts",
+  "types": "./dist/index.d.ts",
   "files": [
     "dist",
-    "src/index.d.ts",
-    "src/oauth/index.d.ts",
     "README.md"
   ],
   "scripts": {
@@ -54,12 +52,14 @@
     "clean": "rm -rf dist .turbo"
   },
   "dependencies": {
+    "@octokit/auth-app": "^7",
     "@octokit/plugin-throttling": "^9",
     "@osprotocol/schema": "catalog:osprotocol",
     "@syner/sdk": "workspace:*",
     "octokit": "^4"
   },
   "peerDependencies": {
+    "ai": "catalog:aisdk",
     "zod": "catalog:aisdk"
   },
   "devDependencies": {

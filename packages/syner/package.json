@@ -45,7 +45,9 @@
   },
   "devDependencies": {
     "@syner/eslint": "workspace:*",
+    "@syner/github": "workspace:*",
     "@syner/prettier": "workspace:*",
+    "@syner/sdk": "workspace:*",
     "@syner/typescript": "workspace:*",
     "@types/bun": "*",
     "eslint": "catalog:",
