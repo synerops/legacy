@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "syner": {
+      "command": "bun",
+      "args": ["--env-file=apps/dev/.env.local", "run", "packages/mcp/src/server.ts"]
+    }
+  }
+}
