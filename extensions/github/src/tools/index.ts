@@ -8,3 +8,4 @@ export { getFileContentTool, type GetFileContentToolOptions } from './getFileCon
 export { listDirectoryTool, type ListDirectoryToolOptions } from './listDirectory'
 export { getRepoInfoTool, type GetRepoInfoToolOptions } from './getRepoInfo'
 export { searchCodeTool, type SearchCodeToolOptions } from './searchCode'
+export { createPullRequestTool, type CreatePullRequestToolOptions } from './createPullRequest'

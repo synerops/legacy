@@ -20,6 +20,7 @@ import {
   listDirectoryTool,
   getRepoInfoTool,
   searchCodeTool,
+  createPullRequestTool,
 } from '@syner/github'
 import { createUpstashKv } from '@syner/upstash'
 
@@ -92,6 +93,7 @@ function getTools() {
     github_listDirectory: listDirectoryTool({ client }),
     github_getRepoInfo: getRepoInfoTool({ client }),
     github_searchCode: searchCodeTool({ client }),
+    github_createPullRequest: createPullRequestTool({ client }),
   }
 }
 

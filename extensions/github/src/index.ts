@@ -56,8 +56,10 @@ export {
   listDirectoryTool,
   getRepoInfoTool,
   searchCodeTool,
+  createPullRequestTool,
   type GetFileContentToolOptions,
   type ListDirectoryToolOptions,
   type GetRepoInfoToolOptions,
   type SearchCodeToolOptions,
+  type CreatePullRequestToolOptions,
 } from './tools'
