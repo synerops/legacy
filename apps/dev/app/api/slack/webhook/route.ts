@@ -12,8 +12,16 @@
  */
 
 import { after } from 'next/server'
-import { createHandler, createSlackClient, streamReply, replyInThread, setAssistantStatus } from '@syner/slack'
-import { stream, card } from 'syner'
+import { createHandler, createSlackClient, replyInThread, setAssistantStatus } from '@syner/slack'
+import { think, card } from 'syner'
+import {
+  createGitHubAppClient,
+  getFileContentTool,
+  listDirectoryTool,
+  getRepoInfoTool,
+  searchCodeTool,
+} from '@syner/github'
+import { createUpstashKv } from '@syner/upstash'
 
 const SLACK_SYSTEM_PROMPT = `You are ${card().name}, an AI assistant for Slack that understands what you need and coordinates tools and agents to get things done.
 
@@ -55,31 +63,61 @@ function getSlackClient() {
   return createSlackClient({ botToken })
 }
 
+// Lazy-initialized clients (deferred until first request to avoid build-time errors)
+let githubClient: ReturnType<typeof createGitHubAppClient> | null = null
+let kv: ReturnType<typeof createUpstashKv> | null = null
+
+function getGitHubClient() {
+  if (!githubClient) {
+    githubClient = createGitHubAppClient({
+      appId: process.env.GITHUB_APP_ID!,
+      privateKey: process.env.GITHUB_PRIVATE_KEY!,
+      installationId: process.env.GITHUB_INSTALLATION_ID!,
+    })
+  }
+  return githubClient
+}
+
+function getKv() {
+  if (!kv) {
+    kv = createUpstashKv()
+  }
+  return kv
+}
+
+function getTools() {
+  const client = getGitHubClient()
+  return {
+    github_getFileContent: getFileContentTool({ client, kv: getKv() }),
+    github_listDirectory: listDirectoryTool({ client }),
+    github_getRepoInfo: getRepoInfoTool({ client }),
+    github_searchCode: searchCodeTool({ client }),
+  }
+}
+
 export const POST = createHandler({
   signingSecret: process.env.SLACK_SIGNING_SECRET!,
   afterFn: after,
   onError: (error) => console.error('[slack webhook]', error),
 
-  onAppMention: async (event, envelope) => {
+  onAppMention: async (event) => {
     const client = getSlackClient()
     const channel = event.channel
     const threadTs = event.thread_ts ?? event.ts
 
     await setAssistantStatus(client, { channelId: channel, threadTs, status: 'Thinking...' })
 
-    const result = stream(event.text, { systemPrompt: SLACK_SYSTEM_PROMPT })
-    await streamReply(client, {
-      channel,
-      threadTs,
-      teamId: envelope.team_id,
-      userId: event.user,
-      textStream: result.textStream,
+    const { text } = await think(event.text, {
+      systemPrompt: SLACK_SYSTEM_PROMPT,
+      tools: getTools(),
+      maxSteps: 5,
     })
+    await replyInThread(client, { channel, threadTs, text })
   },
 
-  onAssistantThreadStarted: async (event, envelope) => {
+  onAssistantThreadStarted: async (event) => {
     const client = getSlackClient()
-    const { channel_id, thread_ts, user_id } = event.assistant_thread
+    const { channel_id, thread_ts } = event.assistant_thread
 
     await setAssistantStatus(client, {
       channelId: channel_id,
@@ -87,16 +125,10 @@ export const POST = createHandler({
       status: 'Thinking...',
     })
 
-    const result = stream('A new conversation has started. Introduce yourself briefly.', {
+    const { text } = await think('A new conversation has started. Introduce yourself briefly.', {
       systemPrompt: SLACK_SYSTEM_PROMPT,
     })
-    await streamReply(client, {
-      channel: channel_id,
-      threadTs: thread_ts,
-      teamId: envelope.team_id,
-      userId: user_id,
-      textStream: result.textStream,
-    })
+    await replyInThread(client, { channel: channel_id, threadTs: thread_ts, text })
   },
 
   onAssistantThreadContextChanged: async (event) => {
@@ -109,20 +141,18 @@ export const POST = createHandler({
     })
   },
 
-  onMessage: async (event, envelope) => {
+  onMessage: async (event) => {
     const client = getSlackClient()
     const channel = event.channel
     const threadTs = event.thread_ts ?? event.ts
 
     await setAssistantStatus(client, { channelId: channel, threadTs, status: 'Thinking...' })
 
-    const result = stream(event.text, { systemPrompt: SLACK_SYSTEM_PROMPT })
-    await streamReply(client, {
-      channel,
-      threadTs,
-      teamId: envelope.team_id,
-      userId: event.user,
-      textStream: result.textStream,
+    const { text } = await think(event.text, {
+      systemPrompt: SLACK_SYSTEM_PROMPT,
+      tools: getTools(),
+      maxSteps: 5,
     })
+    await replyInThread(client, { channel, threadTs, text })
   },
 })

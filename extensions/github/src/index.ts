@@ -28,10 +28,12 @@ export {
 export {
   createGitHubClient,
   createGitHubClientFromTokens,
+  createGitHubAppClient,
   getAuthenticatedUser,
   getFileContent,
   type GitHubClient,
   type GitHubClientOptions,
+  type GitHubAppClientOptions,
   type FileContent,
   type GetFileContentOptions,
 } from './api'
@@ -47,3 +49,15 @@ export {
   type CachedFetchOptions,
   type CachedFetchResult,
 } from './cache'
+
+// Tools
+export {
+  getFileContentTool,
+  listDirectoryTool,
+  getRepoInfoTool,
+  searchCodeTool,
+  type GetFileContentToolOptions,
+  type ListDirectoryToolOptions,
+  type GetRepoInfoToolOptions,
+  type SearchCodeToolOptions,
+} from './tools'

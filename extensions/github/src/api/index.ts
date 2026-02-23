@@ -11,6 +11,11 @@ export {
 } from './client'
 
 export {
+  createGitHubAppClient,
+  type GitHubAppClientOptions,
+} from './client-app'
+
+export {
   getFileContent,
   type FileContent,
   type GetFileContentOptions,
