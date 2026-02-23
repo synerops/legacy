@@ -5,7 +5,7 @@
  * Uses generateText + gateway() from AI SDK.
  */
 
-import { generateText, gateway } from 'ai'
+import { generateText, streamText, gateway } from 'ai'
 
 export interface ThinkOptions {
   systemPrompt: string
@@ -28,4 +28,26 @@ export async function think(prompt: string, options: ThinkOptions): Promise<Thin
   })
 
   return { text: result.text }
+}
+
+export interface StreamResponse {
+  /** Async iterable of text deltas as they arrive from the model */
+  textStream: AsyncIterable<string>
+}
+
+/**
+ * Streams an LLM response as an async iterable of text deltas.
+ *
+ * Use `.textStream` to iterate over chunks as they arrive from the model.
+ */
+export function stream(prompt: string, options: ThinkOptions): StreamResponse {
+  const modelId = options.model
+    ?? process.env.SYNER_ASSISTANT_MODEL
+    ?? 'anthropic/claude-sonnet-4'
+
+  return streamText({
+    model: gateway(modelId),
+    system: options.systemPrompt,
+    prompt,
+  })
 }

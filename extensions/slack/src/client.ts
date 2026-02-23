@@ -9,7 +9,7 @@
  */
 
 import { WebClient } from '@slack/web-api'
-import type { SlackClientOptions } from './types'
+import type { SlackClientOptions, StreamReplyOptions } from './types'
 
 export type SlackClient = WebClient
 
@@ -124,4 +124,78 @@ export async function setAssistantSuggestedPrompts(
     thread_ts: options.threadTs,
     prompts: options.prompts,
   })
+}
+
+// ============================================================================
+// Streaming (chat:write)
+// ============================================================================
+
+export type { StreamReplyOptions }
+
+/** Characters to buffer before flushing an appendStream call */
+const STREAM_BUFFER_SIZE = 256
+
+/**
+ * Streams text into a Slack thread in real time.
+ *
+ * Pipes an async iterable of text deltas (e.g. AI SDK `streamText().textStream`)
+ * through Slack's streaming API (`chat.startStream` → `chat.appendStream` → `chat.stopStream`).
+ *
+ * Buffers chunks (256 chars) to avoid excessive API calls.
+ * Falls back to a regular `chat.postMessage` if streaming fails to start.
+ */
+export async function streamReply(
+  client: SlackClient,
+  options: StreamReplyOptions
+): Promise<{ text: string }> {
+  let fullText = ''
+
+  // Try to start the stream
+  let streamTs: string | undefined
+  try {
+    const result = await client.chat.startStream({
+      channel: options.channel,
+      thread_ts: options.threadTs,
+      recipient_team_id: options.teamId,
+      recipient_user_id: options.userId,
+    })
+    streamTs = result.ts as string
+  } catch {
+    // Streaming not available — collect all text and post as regular message
+    for await (const chunk of options.textStream) {
+      fullText += chunk
+    }
+    await client.chat.postMessage({
+      channel: options.channel,
+      thread_ts: options.threadTs,
+      text: fullText,
+      mrkdwn: true,
+    })
+    return { text: fullText }
+  }
+
+  // Stream chunks with buffering
+  let buffer = ''
+  for await (const chunk of options.textStream) {
+    fullText += chunk
+    buffer += chunk
+
+    if (buffer.length >= STREAM_BUFFER_SIZE) {
+      await client.chat.appendStream({
+        channel: options.channel,
+        ts: streamTs,
+        markdown_text: buffer,
+      })
+      buffer = ''
+    }
+  }
+
+  // Flush remaining buffer and finalize
+  await client.chat.stopStream({
+    channel: options.channel,
+    ts: streamTs,
+    ...(buffer ? { markdown_text: buffer } : {}),
+  })
+
+  return { text: fullText }
 }
