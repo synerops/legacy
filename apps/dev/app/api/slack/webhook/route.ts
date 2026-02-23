@@ -105,12 +105,11 @@ export const POST = createHandler({
     const channel = event.channel
     const threadTs = event.thread_ts ?? event.ts
 
-    await setAssistantStatus(client, { channelId: channel, threadTs, status: 'Thinking...' })
+    // Note: setAssistantStatus only works in assistant threads, not regular mentions
 
     const { text } = await think(event.text, {
       systemPrompt: SLACK_SYSTEM_PROMPT,
       tools: getTools(),
-      maxSteps: 5,
     })
     await replyInThread(client, { channel, threadTs, text })
   },
@@ -146,12 +145,16 @@ export const POST = createHandler({
     const channel = event.channel
     const threadTs = event.thread_ts ?? event.ts
 
-    await setAssistantStatus(client, { channelId: channel, threadTs, status: 'Thinking...' })
+    // Try to set status, but don't fail if not an assistant thread
+    try {
+      await setAssistantStatus(client, { channelId: channel, threadTs, status: 'Thinking...' })
+    } catch {
+      // Not an assistant thread, ignore
+    }
 
     const { text } = await think(event.text, {
       systemPrompt: SLACK_SYSTEM_PROMPT,
       tools: getTools(),
-      maxSteps: 5,
     })
     await replyInThread(client, { channel, threadTs, text })
   },
