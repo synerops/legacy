@@ -52,13 +52,13 @@ npm-debug.log*
 # Syner runtime
 .syner/
 
-# Planning files (local only)
+# Markdown (only track essential docs)
 *.md
 !README.md
 !AGENTS.md
 !SYNER.md
-!SKILL.md
 !**/README.md
 !**/AGENTS.md
-!**/SKILL.md
+!**/SYNER.md
+!**/prompts/*.md
 .env*.local

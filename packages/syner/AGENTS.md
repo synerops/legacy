@@ -12,78 +12,87 @@ Syner is the meta-orchestrator that:
 
 ## Architecture
 
-Syner provides AI SDK-specific implementations on top of @syner/sdk base classes:
-
 ```
-@syner/sdk (base)     →  syner (AI SDK specific)
-─────────────────────────────────────────────────
-Routing<T>            →  Routing with generateObject
-OrchestratorWorkers   →  (uses SDK base)
-Parallelization       →  (uses SDK base)
-EvaluatorOptimizer    →  (uses SDK base)
+┌─────────────────────────────────────────────────────────────┐
+│                         SYNER                                │
+│                    (Syner class)                            │
+├─────────────────────────────────────────────────────────────┤
+│  Workflows (orchestration patterns)                         │
+│  route, orchestrate, parallelize, evaluate, chain           │
+├─────────────────────────────────────────────────────────────┤
+│  Prompts (modular system)                                   │
+│  identity + guidelines + constraints + tools                │
+└─────────────────────────────────────────────────────────────┘
 ```
 
 ## Directory Structure
 
 ```
-├── AGENT.md              # Syner as agent definition
-├── PERSONALITY.md        # Default personality
-├── RULES.md              # Default rules
+├── SYNER.md              # Agent identity (entry point)
 └── src/
-    ├── agents/           # Agent implementations
-    │   └── router.ts     # Router agent with metadata
-    ├── tools/            # AI SDK tools
-    │   └── route.ts      # route() tool factory
-    ├── workflows/        # AI SDK-specific workflows
-    │   ├── routing.ts    # Uses generateObject
-    │   └── indications.txt
-    └── index.ts
+    ├── index.ts          # Public exports
+    ├── brain.ts          # Syner class + workflow tools
+    └── prompts/
+        ├── index.ts      # instructions() builder
+        ├── identity.md
+        ├── guidelines.md
+        ├── constraints.md
+        └── tools.md
 ```
 
-## Semantic Files
+## Prompt Layers
 
-Syner's behavior is defined by `.md` files:
+| Layer | File | Purpose |
+|-------|------|---------|
+| 1 | `identity.md` | Role, cognitive system, agent loop |
+| 2 | `guidelines.md` | How to think, communicate, principles |
+| 3 | `constraints.md` | What NOT to do |
+| 4 | `tools.md` | Workflow tool descriptions |
+| ext | Extension `.md` | Platform-specific (e.g., Slack formatting) |
 
-| File | Purpose |
-|------|---------|
-| `AGENT.md` | Agent metadata and capabilities |
-| `PERSONALITY.md` | Communication style and tone |
-| `RULES.md` | Constraints and validation rules |
+## Workflow Tools
 
-Users can override these files in their own directories to customize Syner.
+| Tool | Pattern | Use when |
+|------|---------|----------|
+| `route` | Classify → delegate | Task needs ONE handler |
+| `orchestrate` | Plan → workers → synthesize | Multiple specialists sequentially |
+| `parallelize` | Split → parallel → merge | Subtasks are independent |
+| `evaluate` | Generate → evaluate → optimize | Quality is critical |
+| `chain` | Pipeline (output → input) | Steps depend on previous |
 
 ## Usage
 
 ```typescript
-import { Routing, Router, route } from 'syner'
+import { syner } from 'syner'
 
-// Use the Routing workflow
-const routing = new Routing({
-  model: gateway('anthropic/claude-haiku'),
-  workflows: {
-    billing: { workflow: billingWf, description: 'Billing tasks' },
-    support: { workflow: supportWf, description: 'Support tasks' },
-  }
+// Generate with built-in workflow tools
+const { text } = await syner.generate({
+  prompt: 'Help me plan this migration',
+  tools: { /* additional tools */ },
 })
 
-// Or use the route() tool
-const tools = { route: route({ ... }) }
+// With extension instructions
+import { synerMd } from '@syner/slack'
+
+const { text } = await syner.generate({
+  prompt: event.text,
+  md: synerMd,
+})
 ```
 
-## Extending Syner
+## Extending
 
-To extend SDK base classes with custom implementations:
+Create extension SYNER.md files for platform-specific behavior:
 
 ```typescript
-import { OrchestratorWorkers } from 'syner'
-import { generateObject } from 'ai'
+// extensions/slack/SYNER.md
+# Slack Extension
 
-const orchestrator = new OrchestratorWorkers({
-  planner: async (prompt) => {
-    const { object } = await generateObject({ ... })
-    return object
-  },
-  synthesizer: async (results) => { ... },
-  workers: { ... }
-})
+- Use Slack formatting: *bold*, _italic_, `code`
+- Be concise, conversational
+- Match user's language
+
+// extensions/slack/index.ts
+import synerMdRaw from '../SYNER.md'
+export const synerMd: string = synerMdRaw
 ```

@@ -7,18 +7,26 @@
  *
  * @example
  * ```ts
- * import { createHandler, createSlackClient, sendMessage } from '@syner/slack'
+ * import { createHandler, createSlackClient, sendMessage, synerMd } from '@syner/slack'
+ * import { syner } from 'syner'
  *
  * // Wire handler to your API route
  * export const POST = createHandler({
  *   signingSecret: process.env.SLACK_SIGNING_SECRET!,
  *   onAppMention: async (event) => {
  *     const client = createSlackClient({ botToken: process.env.SLACK_BOT_TOKEN! })
- *     await sendMessage(client, { channel: event.channel, text: 'Hello!', threadTs: event.ts })
+ *     const { text } = await syner.generate({ prompt: event.text, md: synerMd })
+ *     await sendMessage(client, { channel: event.channel, text, threadTs: event.ts })
  *   },
  * })
  * ```
  */
+
+// @ts-expect-error — raw .md import handled by tsup loader
+import synerMdRaw from '../SYNER.md'
+
+/** Slack-specific system prompt instructions */
+export const synerMd: string = synerMdRaw
 
 // Handler
 export { createHandler } from './handler'

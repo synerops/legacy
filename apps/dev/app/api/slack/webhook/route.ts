@@ -12,8 +12,8 @@
  */
 
 import { after } from 'next/server'
-import { createHandler, createSlackClient, replyInThread, setAssistantStatus } from '@syner/slack'
-import { think, card } from 'syner'
+import { createHandler, createSlackClient, replyInThread, setAssistantStatus, synerMd } from '@syner/slack'
+import { syner } from 'syner'
 import {
   createGitHubAppClient,
   getFileContentTool,
@@ -23,40 +23,6 @@ import {
   createPullRequestTool,
 } from '@syner/github'
 import { createUpstashKv } from '@syner/upstash'
-
-const SLACK_SYSTEM_PROMPT = `You are ${card().name}, an AI assistant for Slack that understands what you need and coordinates tools and agents to get things done.
-
-<identity>
-${card().description}
-</identity>
-
-<instructions>
-- Respond conversationally. You're in a chat, not writing a document.
-- Be concise. Most messages should be 1-3 short paragraphs.
-- Never show internal reasoning (no "Classifying request", "Strategy", headers).
-- Use Slack formatting: *bold*, _italic_, \`code\`. No markdown headers.
-- Match the user's language. Spanish → Spanish. English → English.
-- Match the user's energy. Casual → casual. Technical → focused.
-- If you don't know something, say so directly.
-</instructions>
-
-<examples>
-<example>
-<user>hola syner</user>
-<response>Hola! En qué te puedo ayudar?</response>
-</example>
-
-<example>
-<user>can you help me plan a migration from postgres to planetscale?</user>
-<response>Sure — a few things to figure out first:
-
-• *Schema compatibility*: PlanetScale uses Vitess, so no foreign keys. Do you rely on FKs?
-• *Data volume*: How big is the DB? Affects migration strategy.
-• *Downtime tolerance*: Maintenance window ok, or zero-downtime?
-
-Once I know those, I can sketch a plan.</response>
-</example>
-</examples>`
 
 function getSlackClient() {
   const botToken = process.env.SLACK_BOT_TOKEN
@@ -109,8 +75,9 @@ export const POST = createHandler({
 
     // Note: setAssistantStatus only works in assistant threads, not regular mentions
 
-    const { text } = await think(event.text, {
-      systemPrompt: SLACK_SYSTEM_PROMPT,
+    const { text } = await syner.generate({
+      prompt: event.text,
+      md: synerMd,
       tools: getTools(),
     })
     await replyInThread(client, { channel, threadTs, text })
@@ -126,8 +93,9 @@ export const POST = createHandler({
       status: 'Thinking...',
     })
 
-    const { text } = await think('A new conversation has started. Introduce yourself briefly.', {
-      systemPrompt: SLACK_SYSTEM_PROMPT,
+    const { text } = await syner.generate({
+      prompt: 'A new conversation has started. Introduce yourself briefly.',
+      md: synerMd,
     })
     await replyInThread(client, { channel: channel_id, threadTs: thread_ts, text })
   },
@@ -154,8 +122,9 @@ export const POST = createHandler({
       // Not an assistant thread, ignore
     }
 
-    const { text } = await think(event.text, {
-      systemPrompt: SLACK_SYSTEM_PROMPT,
+    const { text } = await syner.generate({
+      prompt: event.text,
+      md: synerMd,
       tools: getTools(),
     })
     await replyInThread(client, { channel, threadTs, text })

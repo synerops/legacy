@@ -1,37 +1,21 @@
 /**
- * Syner - Brain of Syner OS
+ * Syner - The Orchestrator Agent of Syner OS
  *
- * Agent card, brain, and intent classification.
+ * Provides the Syner class and singleton for AI-powered orchestration.
  */
 
-// Agent card
-export { card, type AgentCard } from '../card'
-
-// Brain
-export { think, stream, models, type ThinkOptions, type ThinkWithToolsOptions, type ThinkResponse, type StreamResponse } from '../brain'
-
-// Intent classification
 export {
-  // Schemas
-  IntentTypeSchema,
-  ComplexityLevelSchema,
-  WorkflowTypeSchema,
-  AgentTypeSchema,
-  ActionTypeSchema,
-  IntentSchema,
-  ComplexitySchema,
-  StrategySchema,
-  NextActionSchema,
-  IntentClassificationSchema,
+  // Main exports
+  syner,
+  Syner,
+  models,
   // Types
-  type IntentType,
-  type ComplexityLevel,
-  type WorkflowType,
-  type AgentType,
-  type ActionType,
-  type Intent,
-  type Complexity,
-  type Strategy,
-  type NextAction,
-  type IntentClassification,
-} from '../intent'
+  type AgentCard,
+  type GenerateOptions,
+  type GenerateResponse,
+  type StreamOptions,
+  type StreamResponse,
+} from './brain'
+
+// Re-export prompts utilities
+export { instructions } from './prompts'
