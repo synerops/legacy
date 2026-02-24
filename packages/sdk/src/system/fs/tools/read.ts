@@ -1,26 +1,58 @@
 /**
- * Read file tool (placeholder implementation)
+ * Read file tool
  *
- * This is a base implementation. Extensions like @syner/vercel
- * provide concrete implementations with actual file system access.
+ * Factory function creates a tool bound to a specific Fs instance.
+ * Placeholder export provided for backward compatibility.
  */
 
 import { tool } from 'ai'
 import { z } from 'zod'
+import type { Fs } from '@osprotocol/schema/system/fs'
 
+const inputSchema = z.object({
+  path: z.string().describe('Path to the file to read'),
+})
+
+/**
+ * Creates a read tool bound to the provided filesystem.
+ *
+ * @example
+ * ```ts
+ * const fs = createDiskFs({ root: '.syner' })
+ * const readTool = createReadTool(fs)
+ *
+ * const result = await generateText({
+ *   tools: { read: readTool },
+ *   prompt: 'Read /sessions/auth/context.md',
+ * })
+ * ```
+ */
+export function createReadTool(fs: Fs) {
+  return tool({
+    description: 'Read file contents from the filesystem',
+    inputSchema,
+    execute: async ({ path }) => {
+      const content = await fs.read(path)
+      if (content === null) {
+        return { success: false, error: `File not found: ${path}` }
+      }
+      return { success: true, content }
+    },
+  })
+}
+
+/**
+ * Placeholder read tool.
+ *
+ * @deprecated Use createReadTool(fs) instead
+ */
 export const read = tool({
   description: 'Read file contents from the filesystem',
-  inputSchema: z.object({
-    path: z.string().describe('Path to the file to read'),
-    encoding: z.enum(['utf-8', 'base64']).optional().describe('File encoding (default: utf-8)'),
+  inputSchema,
+  execute: async ({ path }) => ({
+    success: false,
+    error: `Fs not configured. Use createReadTool(fs). Path: ${path}`,
   }),
-  execute: async ({ path }) => {
-    // This is a placeholder - concrete implementations are provided by extensions
-    return {
-      success: false,
-      error: `File system not available. Use an extension like @syner/vercel for file operations. Path: ${path}`,
-    }
-  },
 })
 
 export default read

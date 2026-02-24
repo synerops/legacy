@@ -11,6 +11,9 @@ export type {
 // Config
 export { findProjectRoot } from './config'
 
+// Git
+export { findGitRoot } from './git'
+
 // Security
 export {
   SecurityError,
@@ -21,5 +24,3 @@ export {
   isWithinAllowedPaths,
   assertWithinAllowedPaths,
 } from './security'
-
-// Runtime - removed (SKILL.md no longer exists in OSP)

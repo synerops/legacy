@@ -10,7 +10,7 @@ import type { Tool } from 'ai'
 import { z } from 'zod'
 import matter from 'gray-matter'
 import { instructions } from './prompts'
-import { createMemoryFs } from '@syner/sdk'
+import { createSystem } from '@syner/sdk'
 import { createMemoryTool } from './tools/memory'
 import { createPlanTool } from './tools/plan'
 import { classify, type Intent } from './intent'
@@ -260,10 +260,10 @@ export class Syner {
     // 1. Classify intent (includes sessionName)
     const intent = await classify(prompt)
 
-    // 2. Create session with Fs
-    const fs = createMemoryFs()
-    const memory = createMemoryTool(fs, intent.sessionName)
-    const plan = createPlanTool(fs, intent.sessionName)
+    // 2. Create session with System
+    const system = createSystem()
+    const memory = createMemoryTool(system.fs, intent.sessionName)
+    const plan = createPlanTool(system.fs, intent.sessionName)
 
     // 3. Handle based on intent type
     const handlers: Record<Intent['type'], () => Promise<GenerateResponse>> = {

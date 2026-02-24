@@ -1,28 +1,56 @@
 /**
- * Write file tool (placeholder implementation)
+ * Write file tool
  *
- * This is a base implementation. Extensions like @syner/vercel
- * provide concrete implementations with actual file system access.
+ * Factory function creates a tool bound to a specific Fs instance.
+ * Placeholder export provided for backward compatibility.
  */
 
 import { tool } from 'ai'
 import { z } from 'zod'
+import type { Fs } from '@osprotocol/schema/system/fs'
 
 const inputSchema = z.object({
   path: z.string().describe('Path to the file to write'),
-  content: z.string().describe('Content to write to the file'),
+  content: z.string().describe('Content to write'),
 })
 
+/**
+ * Creates a write tool bound to the provided filesystem.
+ *
+ * @example
+ * ```ts
+ * const fs = createDiskFs({ root: '.syner' })
+ * const writeTool = createWriteTool(fs)
+ *
+ * const result = await generateText({
+ *   tools: { write: writeTool },
+ *   prompt: 'Write "Hello" to /test.md',
+ * })
+ * ```
+ */
+export function createWriteTool(fs: Fs) {
+  return tool({
+    description: 'Write content to a file',
+    inputSchema,
+    execute: async ({ path, content }) => {
+      const entry = await fs.write(path, content)
+      return { success: true, path: entry.path, size: entry.size }
+    },
+  })
+}
+
+/**
+ * Placeholder write tool.
+ *
+ * @deprecated Use createWriteTool(fs) instead
+ */
 export const write = tool({
-  description: 'Write content to a file in the filesystem',
+  description: 'Write content to a file',
   inputSchema,
-  execute: async (args: z.infer<typeof inputSchema>) => {
-    // This is a placeholder - concrete implementations are provided by extensions
-    return {
-      success: false as const,
-      error: `File system not available. Use an extension like @syner/vercel for file operations. Path: ${args.path}`,
-    }
-  },
+  execute: async ({ path }) => ({
+    success: false,
+    error: `Fs not configured. Use createWriteTool(fs). Path: ${path}`,
+  }),
 })
 
 export default write
