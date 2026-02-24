@@ -19,3 +19,10 @@ export {
 
 // Re-export prompts utilities
 export { instructions } from './prompts'
+
+// Intent classification
+export { classify, type Intent, type PlanSuggestion } from './intent'
+
+// Tools
+export { createMemoryTool, type MemoryInput } from './tools/memory'
+export { createPlanTool, type PlanInput, type Workflow } from './tools/plan'

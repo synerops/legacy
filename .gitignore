@@ -61,4 +61,5 @@ npm-debug.log*
 !**/AGENTS.md
 !**/SYNER.md
 !**/prompts/*.md
+!**/instructions.md
 .env*.local

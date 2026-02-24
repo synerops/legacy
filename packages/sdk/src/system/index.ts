@@ -36,4 +36,7 @@ export type {
   Filesystem,
 } from './fs/protocol'
 
+// OSP Fs implementation
+export { createMemoryFs } from './fs'
+
 export { env } from './env';

@@ -11,6 +11,10 @@ export * from './lib'
 export type { Sandbox, CreateSandboxOptions, Filesystem } from './system'
 export { env } from './system'
 
+// Fs (protocol/system/fs)
+export type { Fs, FsEntry, FsContext, FsActions } from '@osprotocol/schema/system/fs'
+export { createMemoryFs } from './system/fs'
+
 // KV Store (protocol/context/kv)
 export type { Kv, KvEntry, KvContext, KvActions } from './context/kv'
 export { createMemoryKv, type MemoryKvOptions } from './context/kv'

@@ -10,6 +10,10 @@ import type { Tool } from 'ai'
 import { z } from 'zod'
 import matter from 'gray-matter'
 import { instructions } from './prompts'
+import { createMemoryFs } from '@syner/sdk'
+import { createMemoryTool } from './tools/memory'
+import { createPlanTool } from './tools/plan'
+import { classify, type Intent } from './intent'
 
 // @ts-expect-error — raw .md import handled by tsup loader
 import synerMdRaw from '../SYNER.md'
@@ -116,7 +120,7 @@ const workflowTools = {
 export const models = {
   sonnet: 'anthropic/claude-sonnet-4',
   opus: 'anthropic/claude-opus-4',
-  haiku: 'anthropic/claude-haiku-3',
+  haiku: 'anthropic/claude-haiku-4.5',
 } as const
 
 function resolveModel(id: string): string {
@@ -241,6 +245,39 @@ export class Syner {
       system: systemPrompt,
       prompt: options.prompt,
     })
+  }
+
+  /**
+   * Ask Syner with orchestration.
+   *
+   * Entry point that classifies intent, creates a session,
+   * and generates a response with memory + plan tools.
+   *
+   * @param prompt - User message
+   * @returns GenerateResponse (same as generate())
+   */
+  async ask(prompt: string): Promise<GenerateResponse> {
+    // 1. Classify intent (includes sessionName)
+    const intent = await classify(prompt)
+
+    // 2. Create session with Fs
+    const fs = createMemoryFs()
+    const memory = createMemoryTool(fs, intent.sessionName)
+    const plan = createPlanTool(fs, intent.sessionName)
+
+    // 3. Handle based on intent type
+    const handlers: Record<Intent['type'], () => Promise<GenerateResponse>> = {
+      respond: () => this.generate({ prompt }),
+
+      clarify: () =>
+        this.generate({
+          prompt: `${prompt}\n\nPlease ask a clarifying question: ${intent.reasoning}`,
+        }),
+
+      act: () => this.generate({ prompt, tools: { memory, plan } }),
+    }
+
+    return handlers[intent.type]()
   }
 }
 
