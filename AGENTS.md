@@ -2,7 +2,7 @@
 
 ## What is Syner OS?
 
-Syner OS is a **Semantic and Agentic Operating System** where:
+Syner OS is **a Cloud for Agents** where:
 
 1. **Semantic**: The "source code" are `.md` files (SKILL.md, AGENT.md) that define behavior in natural language
 2. **Agentic**: AI agents orchestrate workflows, with **Syner** as the default meta-orchestrator

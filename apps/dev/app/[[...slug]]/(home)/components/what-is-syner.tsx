@@ -28,7 +28,7 @@ export const WhatIsSyner = () => (
         What is Syner OS?
       </h2>
       <p className="mx-auto mt-4 max-w-2xl text-center text-muted-foreground">
-        An agentic operating system that lets you build AI agents using simple
+        A Cloud for Agents that lets you build AI agents using simple
         markdown files.
       </p>
       <div className="mt-12 grid gap-8 sm:grid-cols-3">

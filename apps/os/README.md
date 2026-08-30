@@ -2,7 +2,7 @@
 
 ## What is Syner OS?
 
-Syner OS is an Agentic Operating System that implements the [OS Protocol](https://github.com/synerops/protocol) specification. It provides a runtime environment where AI agents can operate with identity, skills, and structured workflows.
+Syner OS is a Cloud for Agents that implements the [OS Protocol](https://github.com/synerops/protocol) specification. It provides a runtime environment where AI agents can operate with identity, skills, and structured workflows.
 
 The OS enables agents to follow a disciplined loop: gather context, execute actions, validate with checks, and repeat. This pattern ensures predictable, auditable agent behavior.
 

@@ -1,7 +1,7 @@
 {
   "name": "os",
   "version": "0.0.1",
-  "description": "syner OS: the agentic operating system",
+  "description": "syner OS: a Cloud for Agents",
   "private": true,
   "scripts": {
     "dev": "next dev",

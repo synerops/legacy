@@ -5,7 +5,7 @@ const repos = [
   {
     name: "synerops/syner",
     description:
-      "Syner OS monorepo - the agentic operating system implementation",
+      "Syner OS monorepo - the Cloud for Agents implementation",
     href: "https://github.com/synerops/syner",
   },
   {

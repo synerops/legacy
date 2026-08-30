@@ -1,6 +1,6 @@
 # Syner OS Application
 
-Main runtime for the Agentic Operating System implementing the OS Protocol.
+Main runtime for Syner, a Cloud for Agents, implementing the OS Protocol.
 
 ## Routes
 

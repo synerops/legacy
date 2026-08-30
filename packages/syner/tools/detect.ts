@@ -14,7 +14,7 @@ import { generateObject } from 'ai'
 import { gateway } from 'ai'
 import { IntentClassificationSchema } from '../intent'
 
-const SYSTEM_PROMPT = `You are an intent classifier for an agentic operating system.
+const SYSTEM_PROMPT = `You are an intent classifier for a Cloud for Agents.
 
 Analyze the user's prompt and classify it according to:
 

@@ -1,5 +1,5 @@
 /**
- * Syner Agentic OS SDK
+ * Syner Cloud for Agents SDK
  *
  * Implements the OS Protocol specification
  */
